@@ -58,6 +58,7 @@
 		7819CD3825EDA375003B23F7 /* PhotoEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7819CD3725EDA375003B23F7 /* PhotoEditor.swift */; };
 		7819CD5025EDCEFD003B23F7 /* caleb-chen-l9Vrl5RT-jw-unsplash.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 7819CD4F25EDCEFD003B23F7 /* caleb-chen-l9Vrl5RT-jw-unsplash.jpg */; };
 		7819CD5525EDDAF3003B23F7 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 7819CD5425EDDAF3003B23F7 /* README.md */; };
+		91191BDD25F4833A00197198 /* ConcurrentCompactMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91191BDC25F4833A00197198 /* ConcurrentCompactMap.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -135,6 +136,7 @@
 		7819CD3725EDA375003B23F7 /* PhotoEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoEditor.swift; sourceTree = "<group>"; };
 		7819CD4F25EDCEFD003B23F7 /* caleb-chen-l9Vrl5RT-jw-unsplash.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "caleb-chen-l9Vrl5RT-jw-unsplash.jpg"; sourceTree = "<group>"; };
 		7819CD5425EDDAF3003B23F7 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		91191BDC25F4833A00197198 /* ConcurrentCompactMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcurrentCompactMap.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -190,6 +192,7 @@
 				7819CC8025ED42D8003B23F7 /* SceneDelegate.swift */,
 				7819CCE825ED435C003B23F7 /* Gallery */,
 				7819CCE925ED4369003B23F7 /* Photo Editor */,
+				91191BDB25F4831700197198 /* Utilities */,
 				7819CCB725ED433F003B23F7 /* Bundled Photo Library */,
 				7819CC8725ED42DB003B23F7 /* Assets.xcassets */,
 				7819CC8925ED42DB003B23F7 /* LaunchScreen.storyboard */,
@@ -279,6 +282,14 @@
 				7819CD1E25ED7061003B23F7 /* PixellateFilter.swift */,
 			);
 			path = "Photo Editor";
+			sourceTree = "<group>";
+		};
+		91191BDB25F4831700197198 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				91191BDC25F4833A00197198 /* ConcurrentCompactMap.swift */,
+			);
+			path = Utilities;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -457,6 +468,7 @@
 				7819CD1F25ED7061003B23F7 /* PixellateFilter.swift in Sources */,
 				7819CCCF25ED433F003B23F7 /* GalleryDataSource.swift in Sources */,
 				7819CC8125ED42D8003B23F7 /* SceneDelegate.swift in Sources */,
+				91191BDD25F4833A00197198 /* ConcurrentCompactMap.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

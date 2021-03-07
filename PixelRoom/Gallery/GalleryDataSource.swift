@@ -45,16 +45,19 @@ class GalleryDataSource {
     
     public func reloadPhotos(completion: @escaping ()->Void) {
         DispatchQueue.global(qos: .background).async {
+            
             var allItems: [PhotoItem] = Constants.supportedFileTypes
                 .flatMap { Bundle.main.paths(forResourcesOfType: $0, inDirectory: nil) }
-                .compactMap {
+                .concurrentCompactMap {
                     let url = URL(fileURLWithPath: $0)
                     let name = url.deletingPathExtension().lastPathComponent
                     guard name.contains(Constants.bundledPhotoNameTag),
-                          let data = try? Data(contentsOf: url),
-                          let image = UIImage(data: data) else {
+                          let data = try? Data(contentsOf: url)
+                    else {
                         return nil
                     }
+                    
+                    let image = Self.createThumbnail(from: data)
                     return PhotoItem(name: name, thumbnail: image, url: url)
                 }.shuffled()
             
@@ -95,7 +98,9 @@ class GalleryDataSource {
 
 extension GalleryDataSource {
     
-    private func createThumbnail(from imageData: Data) -> UIImage {
+    // I made this static so the closure in reloadPhotos could call this
+    // without having to retain `self`.
+    private static func createThumbnail(from imageData: Data) -> UIImage {
         let options = [
             kCGImageSourceCreateThumbnailWithTransform: true,
             kCGImageSourceCreateThumbnailFromImageAlways: true,
