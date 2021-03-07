@@ -20,7 +20,10 @@ class PixellateFilter {
         let center = CGPoint(x: inputImage.extent.width / 2, y: inputImage.extent.height / 2)
         filter.setValue(inputImage, forKey: kCIInputImageKey)
         filter.setValue(CIVector(cgPoint: center), forKey: "inputCenter")
-        filter.setValue(NSNumber(value: inputScale), forKey: "inputScale")
+        
+        // CIPixellate's inputScale only works for values >= 1.
+        let validatedScale = max(inputScale, 1)
+        filter.setValue(NSNumber(value: validatedScale), forKey: "inputScale")
         
         guard let outputImage = filter.outputImage,
               let outputCGImage = context.createCGImage(outputImage, from: inputImage.extent)

@@ -80,8 +80,8 @@ class PhotoEditorViewController: UIViewController, PhotoEditorView {
         scaleSliderStackView.spacing = 16
         scaleSliderStackView.addArrangedSubview(scaleSlider)
         scaleSliderStackView.addArrangedSubview(valueLabel)
-        scaleSlider.value = model?.currentPixellateInputScaleValue ?? 0.0
-        scaleSlider.minimumValue = 0.0
+        scaleSlider.value = model?.currentPixellateInputScaleValue ?? 1.0
+        scaleSlider.minimumValue = 1.0
         scaleSlider.maximumValue = 50.0
         scaleSlider.tintColor = .orange
         scaleSlider.thumbTintColor = .darkGray
