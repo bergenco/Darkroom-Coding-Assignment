@@ -64,10 +64,12 @@ class GalleryDataSource {
             let footerItems = allItems.prefix(Constants.featureFooterCount)
             allItems.removeFirst(footerItems.count)
             
-            self.featuredPhotos = GallerySection(style: .featured, items: Array(featuredItems))
-            self.photos = GallerySection(style: .normal, items: allItems)
-            self.featuredFooterPhotos = GallerySection(style: .featuredFooter, items: Array(footerItems))
-            completion()
+            DispatchQueue.main.async {
+                self.featuredPhotos = GallerySection(style: .featured, items: Array(featuredItems))
+                self.photos = GallerySection(style: .normal, items: allItems)
+                self.featuredFooterPhotos = GallerySection(style: .featuredFooter, items: Array(footerItems))
+                completion()
+            }
         }
     }
 
