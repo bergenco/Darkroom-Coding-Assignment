@@ -100,6 +100,9 @@ extension GalleryDataSource {
     
     // I made this static so the closure in reloadPhotos could call this
     // without having to retain `self`.
+    //
+    // TODO: Potentially make the size a parameter so we generate slighly larger
+    // thumbnails when the preview is shown in a larger context (such as our larger gallery view).
     private static func createThumbnail(from imageData: Data) -> UIImage {
         let options = [
             kCGImageSourceCreateThumbnailWithTransform: true,
