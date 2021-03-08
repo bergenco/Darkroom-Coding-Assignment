@@ -7,10 +7,14 @@
 
 import UIKit
 
-struct PhotoItem: Equatable {
+struct PhotoItem: Equatable, Identifiable {
     let name: String
     let thumbnail: UIImage
     let url: URL
+    
+    var id: String {
+        name
+    }
 }
 
 enum GallerySectionStyle {
@@ -57,7 +61,7 @@ class GalleryDataSource {
                         return nil
                     }
                     
-                    let image = Self.createThumbnail(from: data)
+                    let image = Self.thumbnailImage(forId: name, imageData: data)
                     return PhotoItem(name: name, thumbnail: image, url: url)
                 }.shuffled()
             
@@ -94,9 +98,52 @@ class GalleryDataSource {
     
 }
 
+extension GalleryDataSource: PhotoGalleryProtocol {
+    
+    // This is a hacky way to update the thumbnail photo without altering the random order that
+    // was generated on app launch.
+    //
+    // Given time, I would move this to use NSDiffableDataSource and just update pass a new PhotoItem
+    // to the dataSources snapshot to update it.
+    func refreshPhoto(withId id: PhotoItem.ID) {
+        
+        if let edited = updateSection(featuredPhotos, containingPhotoId: id) {
+            featuredPhotos = edited
+        }
+        
+        if let edited = updateSection(featuredFooterPhotos, containingPhotoId: id) {
+            featuredFooterPhotos = edited
+        }
+        
+        if let edited = updateSection(photos, containingPhotoId: id) {
+            photos = edited
+        }
+    }
+    
+    private func updateSection(_ section: GallerySection, containingPhotoId id: PhotoItem.ID) -> GallerySection? {
+        
+        guard let index = section.items.firstIndex(where: { $0.id == id }),
+              let newThumbnail = PhotoItem.pixellatedThumbnail(forId: id)
+        else {
+            return nil
+        }
+        
+        var items = section.items
+        
+        let itemToEdit = items[index]
+        items[index] = PhotoItem(name: itemToEdit.name, thumbnail: newThumbnail, url: itemToEdit.url)
+        
+        return GallerySection(style: section.style, items: items)
+    }
+}
+
 // MARK: - Helpers
 
 extension GalleryDataSource {
+    
+    private static func thumbnailImage(forId id: PhotoItem.ID, imageData: Data) -> UIImage {
+        PhotoItem.pixellatedThumbnail(forId: id) ?? createThumbnail(from: imageData)
+    }
     
     // I made this static so the closure in reloadPhotos could call this
     // without having to retain `self`.
@@ -105,8 +152,9 @@ extension GalleryDataSource {
     // thumbnails when the preview is shown in a larger context (such as our larger gallery view).
     private static func createThumbnail(from imageData: Data) -> UIImage {
         let options = [
+            kCGImageSourceCreateThumbnailFromImageIfAbsent: true,
             kCGImageSourceCreateThumbnailWithTransform: true,
-            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceShouldCacheImmediately: true,
             kCGImageSourceThumbnailMaxPixelSize: 150 * UIScreen.main.scale
         ] as CFDictionary
         let source = CGImageSourceCreateWithData(imageData as NSData, nil)!

@@ -16,3 +16,7 @@ protocol PhotoEditorView: class {
     func setupWithModel(_ model: PhotoEditorModelProtocol)
     func setFilteredImage(_ image: UIImage)
 }
+
+protocol PhotoGalleryProtocol: class {
+    func refreshPhoto(withId id: PhotoItem.ID)
+}

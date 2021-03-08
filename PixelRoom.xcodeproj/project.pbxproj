@@ -59,6 +59,7 @@
 		7819CD5025EDCEFD003B23F7 /* caleb-chen-l9Vrl5RT-jw-unsplash.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 7819CD4F25EDCEFD003B23F7 /* caleb-chen-l9Vrl5RT-jw-unsplash.jpg */; };
 		7819CD5525EDDAF3003B23F7 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 7819CD5425EDDAF3003B23F7 /* README.md */; };
 		91191BDD25F4833A00197198 /* ConcurrentCompactMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91191BDC25F4833A00197198 /* ConcurrentCompactMap.swift */; };
+		91191BE225F5BA9500197198 /* ThumbnailScaleConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91191BE125F5BA9500197198 /* ThumbnailScaleConverter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -137,6 +138,7 @@
 		7819CD4F25EDCEFD003B23F7 /* caleb-chen-l9Vrl5RT-jw-unsplash.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "caleb-chen-l9Vrl5RT-jw-unsplash.jpg"; sourceTree = "<group>"; };
 		7819CD5425EDDAF3003B23F7 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		91191BDC25F4833A00197198 /* ConcurrentCompactMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcurrentCompactMap.swift; sourceTree = "<group>"; };
+		91191BE125F5BA9500197198 /* ThumbnailScaleConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailScaleConverter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -280,6 +282,7 @@
 				7819CD3225ED9ADA003B23F7 /* PhotoEditorModel.swift */,
 				7819CCB525ED433F003B23F7 /* PhotoEditorViewController.swift */,
 				7819CD1E25ED7061003B23F7 /* PixellateFilter.swift */,
+				91191BE125F5BA9500197198 /* ThumbnailScaleConverter.swift */,
 			);
 			path = "Photo Editor";
 			sourceTree = "<group>";
@@ -459,6 +462,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				91191BE225F5BA9500197198 /* ThumbnailScaleConverter.swift in Sources */,
 				7819CD3825EDA375003B23F7 /* PhotoEditor.swift in Sources */,
 				7819CCCD25ED433F003B23F7 /* GalleryViewController.swift in Sources */,
 				7819CCFD25ED4963003B23F7 /* GalleryCollectionViewCell.swift in Sources */,

@@ -54,6 +54,7 @@ class PhotoEditorViewController: UIViewController, PhotoEditorView {
         view.addSubview(stackView)
         setupStackView()
         updateValueLabel()
+        setupValueLabel()
         setupScaleSlider()
         setupImageView()
         setupLayout()
@@ -71,6 +72,11 @@ class PhotoEditorViewController: UIViewController, PhotoEditorView {
     private func setupImageView() {
         imageView.backgroundColor = .clear
         imageView.contentMode = .scaleAspectFit
+        imageView.clipsToBounds = true
+    }
+    
+    private func setupValueLabel() {
+        valueLabel.textAlignment = .right
     }
     
     private func setupScaleSlider() {
@@ -80,12 +86,15 @@ class PhotoEditorViewController: UIViewController, PhotoEditorView {
         scaleSliderStackView.spacing = 16
         scaleSliderStackView.addArrangedSubview(scaleSlider)
         scaleSliderStackView.addArrangedSubview(valueLabel)
-        scaleSlider.value = model?.currentPixellateInputScaleValue ?? 1.0
-        scaleSlider.minimumValue = 1.0
+        scaleSlider.minimumValue = 0.0
         scaleSlider.maximumValue = 50.0
         scaleSlider.tintColor = .orange
         scaleSlider.thumbTintColor = .darkGray
-        scaleSlider .addTarget(self, action: #selector(sliderChanged(_:)), for: .valueChanged)
+        scaleSlider.addTarget(self, action: #selector(sliderChanged(_:)), for: .valueChanged)
+        
+        // This needs to be done *after* setting up the
+        // min/max value or slider's layout will be wrong.
+        scaleSlider.value = model?.currentPixellateInputScaleValue ?? 0
     }
     
     
@@ -99,7 +108,7 @@ class PhotoEditorViewController: UIViewController, PhotoEditorView {
             imageView.widthAnchor.constraint(equalTo: stackView.widthAnchor),
             scaleSliderStackView.widthAnchor.constraint(equalTo: stackView.widthAnchor, constant: -60),
             scaleSliderStackView.heightAnchor.constraint(equalToConstant: 120),
-            valueLabel.widthAnchor.constraint(equalToConstant: 25)
+            valueLabel.widthAnchor.constraint(equalToConstant: 44)
         ])
     }
     

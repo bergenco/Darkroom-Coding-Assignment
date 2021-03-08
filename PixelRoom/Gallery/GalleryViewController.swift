@@ -44,6 +44,14 @@ class GalleryViewController: UIViewController {
         setupLayout()
         reloadData()
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        // This just makes sure we are using the latest image after editing.
+        // This is code smell, and in a production app the diffable data source would handle this.
+        collectionView.reloadData()
+    }
 
     // MARK: - Subviews and Layout
     
@@ -119,7 +127,7 @@ class GalleryViewController: UIViewController {
                     )
                     
                     group = .horizontal(layoutSize: groupSize, subitem: item, count: 4)
-                    orthogonalScrollingBehavior = .continuous
+                    orthogonalScrollingBehavior = .continuousGroupLeadingBoundary
                     
                 case .normal:
                     
@@ -178,7 +186,7 @@ extension GalleryViewController: UICollectionViewDelegate, UICollectionViewDataS
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let item = photoDataSource.item(at: indexPath.row, inSection: indexPath.section)
         let editor = PhotoEditorViewController()
-        let model = PhotoEditorModel(with: item, photoEditorView: editor)
+        let model = PhotoEditorModel(with: item, photoEditorView: editor, photoGallery: photoDataSource)
         editor.setupWithModel(model)
         navigationController?.pushViewController(editor, animated: true)
         collectionView.deselectItem(at: indexPath, animated: true)
