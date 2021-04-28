@@ -25,11 +25,13 @@ class PixellateFilter {
         filter.setValue(CIVector(cgPoint: center), forKey: "inputCenter")
         filter.setValue(NSNumber(value: inputScale), forKey: "inputScale")
         
-        guard let outputImage = filter.outputImage,
-              let outputCGImage = context.createCGImage(outputImage, from: inputImage.extent)
-        else {
-            return nil
-        }
+        guard let outputImage = filter.outputImage else { return nil }
+        
+        let insetX = abs(outputImage.extent.minX)
+        let insetY = abs(outputImage.extent.minY)
+        
+        guard let outputCGImage = context.createCGImage(outputImage, from: inputImage.extent.insetBy(dx: insetX, dy: insetY)) else { return nil }
+        
         return UIImage(cgImage: outputCGImage)
     }
 }
