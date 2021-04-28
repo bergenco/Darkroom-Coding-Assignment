@@ -13,10 +13,10 @@ struct PhotoItem: Equatable {
     let url: URL
 }
 
-enum GallerySectionStyle {
+enum GallerySectionStyle: CaseIterable {
     case featured
-    case normal
     case featuredFooter
+    case normal
 }
 
 class GalleryDataSource {
@@ -44,7 +44,7 @@ class GalleryDataSource {
     // MARK: - Public
     
     public func reloadPhotos(completion: @escaping ()->Void) {
-        DispatchQueue.global(qos: .background).async {
+        DispatchQueue.global(qos: .background).async { [weak self] in
             var allItems: [PhotoItem] = Constants.supportedFileTypes
                 .flatMap { Bundle.main.paths(forResourcesOfType: $0, inDirectory: nil) }
                 .compactMap {
@@ -52,10 +52,10 @@ class GalleryDataSource {
                     let name = url.deletingPathExtension().lastPathComponent
                     
                     guard name.contains(Constants.bundledPhotoNameTag),
-                          let data = try? Data(contentsOf: url) else {
+                          let data = try? Data(contentsOf: url),
+                          let image = self?.createThumbnail(from: data) else {
                         return nil
                     }
-                    let image = self.createThumbnail(from: data)
                     
                     return PhotoItem(name: name, thumbnail: image, url: url)
                 }.shuffled()
@@ -66,9 +66,9 @@ class GalleryDataSource {
             let footerItems = allItems.prefix(Constants.featureFooterCount)
             allItems.removeFirst(footerItems.count)
             
-            self.featuredPhotos = GallerySection(style: .featured, items: Array(featuredItems))
-            self.photos = GallerySection(style: .normal, items: allItems)
-            self.featuredFooterPhotos = GallerySection(style: .featuredFooter, items: Array(footerItems))
+            self?.featuredPhotos = GallerySection(style: .featured, items: Array(featuredItems))
+            self?.photos = GallerySection(style: .normal, items: allItems)
+            self?.featuredFooterPhotos = GallerySection(style: .featuredFooter, items: Array(footerItems))
             
             DispatchQueue.main.async {
                 completion()

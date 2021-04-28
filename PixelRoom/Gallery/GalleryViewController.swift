@@ -7,6 +7,9 @@
 
 import UIKit
 
+
+// MARK: - GalleryViewController -
+
 class GalleryViewController: UIViewController {
     
     enum Constants {
@@ -14,11 +17,31 @@ class GalleryViewController: UIViewController {
         static let sectionSpacing: CGFloat = 16
         static let cellIdentifier = "GalleryCollectionViewCell"
     }
+    
+    // MARK: Properties
 
-    private let photoDataSource: GalleryDataSource
-    private let flowLayout: UICollectionViewFlowLayout
-    private let collectionView: UICollectionView
-    private let activityIndicator = UIActivityIndicatorView(style: .large)
+    private let photoDataSource: GalleryDataSource = GalleryDataSource()
+    
+    private lazy var collectionView: UICollectionView = {
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: setupCollectionViewLayout())
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.backgroundColor = .clear
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        collectionView.register(GalleryCollectionViewCell.self, forCellWithReuseIdentifier: Constants.cellIdentifier)
+        
+        return collectionView
+    }()
+    private lazy var activityIndicator: UIActivityIndicatorView = {
+        let activityIndicator = UIActivityIndicatorView(style: .large)
+        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
+        activityIndicator.color = .white
+        activityIndicator.alpha = 0
+        
+        return activityIndicator
+    }()
+    
+    // MARK: Initialization
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         fatalError("Not implemented. Use `init()`")
@@ -29,14 +52,14 @@ class GalleryViewController: UIViewController {
     }
     
     init() {
-        photoDataSource = GalleryDataSource()
-        flowLayout = UICollectionViewFlowLayout()
-        collectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
         super.init(nibName: nil, bundle: nil)
     }
     
+    // MARK: View Lifecyle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         setupSubviews()
         setupLayout()
         reloadData()
@@ -47,35 +70,14 @@ class GalleryViewController: UIViewController {
     private func setupSubviews() {
         title = "Gallery"
         view.backgroundColor = .black
-        view.addSubview(collectionView)
-        view.addSubview(activityIndicator)
-        setupActivityIndicator()
-        setupCollectionView()
-    }
-    
-    private func setupActivityIndicator() {
-        activityIndicator.color = .white
-        activityIndicator.alpha = 0
-    }
-    
-    private func setupCollectionView() {
-        collectionView.backgroundColor = .clear
-        collectionView.delegate = self
-        collectionView.dataSource = self
-        collectionView.register(GalleryCollectionViewCell.self, forCellWithReuseIdentifier: Constants.cellIdentifier)
-        setupCollectionViewLayout()
-    }
-    
-    private func setupCollectionViewLayout() {
-        flowLayout.minimumInteritemSpacing = Constants.interitemSpacing
-        flowLayout.minimumLineSpacing = Constants.interitemSpacing
-        flowLayout.scrollDirection = .vertical
-        flowLayout.sectionInset = UIEdgeInsets(top: Constants.sectionSpacing, left: 0, bottom: Constants.sectionSpacing, right: 0)
+        
+        setupLayout()
     }
     
     private func setupLayout() {
-        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(collectionView)
+        view.addSubview(activityIndicator)
+        
         NSLayoutConstraint.activate([
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.interitemSpacing),
             collectionView.topAnchor.constraint(equalTo: view.topAnchor),
@@ -86,6 +88,21 @@ class GalleryViewController: UIViewController {
         ])
     }
     
+    private func setupCollectionViewLayout() -> UICollectionViewLayout {
+        let layout = UICollectionViewCompositionalLayout { (sectionIndex: Int, layoutEnvironment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection? in
+                 
+                 let section = GallerySectionStyle.allCases[sectionIndex]
+                 switch section {
+                 case .featured: return self.featuredSection()
+                 case .featuredFooter: return self.featuredFooterSection()
+                 case .normal: return self.normalSection()
+                 }
+              }
+        
+              return layout
+    }
+    
+    // MARK: Data
     
     private func reloadData() {
         activityIndicator.alpha = 1.0
@@ -95,6 +112,44 @@ class GalleryViewController: UIViewController {
             self.activityIndicator.alpha = 0
             self.collectionView.reloadData()
         }
+    }
+    
+    // MARK: Section Layout
+    
+    private func featuredSection() -> NSCollectionLayoutSection {
+        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.3), heightDimension: .fractionalHeight(1.0))
+        
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        item.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
+        
+        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalHeight(0.3))
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitem: item, count: 1)
+        let section = NSCollectionLayoutSection(group: group)
+        section.orthogonalScrollingBehavior = .paging
+
+        return section
+    }
+    
+    private func featuredFooterSection() -> NSCollectionLayoutSection {
+        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.3), heightDimension: .fractionalHeight(1.0))
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        item.contentInsets = NSDirectionalEdgeInsets(top: 15, leading: 10, bottom: 15, trailing: 10)
+        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalHeight(0.3))
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitem: item, count: 2)
+        let section = NSCollectionLayoutSection(group: group)
+        section.orthogonalScrollingBehavior = .continuous
+
+        return section
+    }
+    
+    private func normalSection() -> NSCollectionLayoutSection {
+        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalHeight(1.0))
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        item.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 5, bottom: 5, trailing: 10)
+        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(100))
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitem: item, count: 5)
+
+        return NSCollectionLayoutSection(group: group)
     }
 }
 
@@ -129,29 +184,4 @@ extension GalleryViewController: UICollectionViewDelegate, UICollectionViewDataS
         collectionView.deselectItem(at: indexPath, animated: true)
     }
     
-}
-
-// MARK: - UICollectionViewDelegateFlowLayout
-
-extension GalleryViewController: UICollectionViewDelegateFlowLayout {
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let style = photoDataSource.sectionStyleForSecton(indexPath.section)
-        switch style {
-        case.featured:
-            let width = (collectionView.frame.size.width - Constants.interitemSpacing) / 2
-            let height = width / 2
-            return CGSize(width: width, height: height)
-            
-        case .featuredFooter:
-            let width = (collectionView.frame.size.width - 3 * Constants.interitemSpacing) / 4
-            let height = width / 2
-            return CGSize(width: width, height: height)
-        
-        case .normal:
-            let width = (collectionView.frame.size.width - 4 * Constants.interitemSpacing) / 5
-            let height = width
-            return CGSize(width: width, height: height)
-        }
-    }
 }

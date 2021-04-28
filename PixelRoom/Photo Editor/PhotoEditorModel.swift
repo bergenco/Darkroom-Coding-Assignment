@@ -60,6 +60,9 @@ class PhotoEditorModel: PhotoEditorModelProtocol {
     }
     
     func editorDidChangePixellateInputScaleValue(to value: Float) {
+        // Prevent apply too many filter
+        guard pixellateInputScaleValue.rounded() != value.rounded() else { return }
+        
         pixellateInputScaleValue = value
         storePixellateEdits()
         applyPixellateFilter()

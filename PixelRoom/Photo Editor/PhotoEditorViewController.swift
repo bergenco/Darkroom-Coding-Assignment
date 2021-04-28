@@ -38,8 +38,6 @@ class PhotoEditorViewController: UIViewController, PhotoEditorView {
     
     func setupWithModel(_ model: PhotoEditorModelProtocol) {
         self.model = model
-        scaleSlider.value = model.currentPixellateInputScaleValue
-        updateValueLabel()
     }
     
     func setFilteredImage(_ image: UIImage) {
@@ -53,8 +51,8 @@ class PhotoEditorViewController: UIViewController, PhotoEditorView {
         view.backgroundColor = .black
         view.addSubview(stackView)
         setupStackView()
-        updateValueLabel()
         setupScaleSlider()
+        updateValueLabel()
         setupImageView()
         setupLayout()
     }
@@ -80,9 +78,9 @@ class PhotoEditorViewController: UIViewController, PhotoEditorView {
         scaleSliderStackView.spacing = 16
         scaleSliderStackView.addArrangedSubview(scaleSlider)
         scaleSliderStackView.addArrangedSubview(valueLabel)
-        scaleSlider.minimumValue = PixellateFilter.minInputScale
+        scaleSlider.minimumValue = 1.0
         scaleSlider.maximumValue = 50.0
-        scaleSlider.value = model?.currentPixellateInputScaleValue ?? PixellateFilter.minInputScale
+        scaleSlider.value = model?.currentPixellateInputScaleValue ?? 1.0
         scaleSlider.tintColor = .orange
         scaleSlider.thumbTintColor = .darkGray
         scaleSlider .addTarget(self, action: #selector(sliderChanged(_:)), for: .valueChanged)
