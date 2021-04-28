@@ -50,11 +50,13 @@ class GalleryDataSource {
                 .compactMap {
                     let url = URL(fileURLWithPath: $0)
                     let name = url.deletingPathExtension().lastPathComponent
+                    
                     guard name.contains(Constants.bundledPhotoNameTag),
-                          let data = try? Data(contentsOf: url),
-                          let image = UIImage(data: data) else {
+                          let data = try? Data(contentsOf: url) else {
                         return nil
                     }
+                    let image = self.createThumbnail(from: data)
+                    
                     return PhotoItem(name: name, thumbnail: image, url: url)
                 }.shuffled()
             
