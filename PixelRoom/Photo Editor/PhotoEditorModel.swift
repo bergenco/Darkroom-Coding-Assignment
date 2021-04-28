@@ -60,28 +60,43 @@ class PhotoEditorModel: PhotoEditorModelProtocol {
     }
     
     func editorDidChangePixellateInputScaleValue(to value: Float) {
-        // Prevent apply too many filter
         guard pixellateInputScaleValue.rounded() != value.rounded() else { return }
         
         pixellateInputScaleValue = value
-        storePixellateEdits()
         applyPixellateFilter()
     }
     
-    func storePixellateEdits() {
-        let userDefaults = UserDefaults.standard
-        userDefaults.setValue(pixellateInputScaleValue, forKey: "inputscale")
-        userDefaults.synchronize()
+    func storeEditedImage(_ image: UIImage?) {
+        let defaults = UserDefaults.standard
+        
+        guard pixellateInputScaleValue != PixellateFilter.minInputScale else {
+            // Remove the edited item on initial scale
+            defaults.setValue(nil, forKey: item.name)
+            return
+        }
+        
+        guard let image = image?.resized(),
+              let data = image.jpegData(compressionQuality: 0.2) else {
+            return
+        }
+        
+        let editemItem = EditedItem(data: data, inputScale: pixellateInputScaleValue)
+        
+        let encoder = JSONEncoder()
+        if let encoded = try? encoder.encode(editemItem) {
+            
+            defaults.set(encoded, forKey: item.name)
+        }
     }
     
     func loadPixellateEdits() {
         let userDefaults = UserDefaults.standard
         
-        if userDefaults.object(forKey: "inputScale") == nil {
-            pixellateInputScaleValue = PixellateFilter.minInputScale
-            userDefaults.setValue(PixellateFilter.minInputScale, forKey: "inputScale")
-        } else {
-            pixellateInputScaleValue = userDefaults.float(forKey: "inputScale")
+        if let data = userDefaults.object(forKey: item.name) as? Data {
+            let decoder = JSONDecoder()
+            if let editedItem = try? decoder.decode(EditedItem.self, from: data) {
+                pixellateInputScaleValue = editedItem.inputScale
+            }
         }
     }
 }
@@ -90,18 +105,25 @@ class PhotoEditorModel: PhotoEditorModelProtocol {
 
 extension UIImage {
     static func resizedImage(from url: URL) -> UIImage? {
-        let maxSize = UIScreen.main.bounds.size
+        
         guard let image = UIImage(contentsOfFile: url.path) else {
             return nil
         }
-        let scale = max(maxSize.width / image.size.width, maxSize.height / image.size.height)
+        
+        return image.resized()
+    }
+    
+    func resized() -> UIImage {
+        let maxSize = UIScreen.main.bounds.size
+        
+        let scale = max(maxSize.width / size.width, maxSize.height / size.height)
         let renderSize = CGSize(
-            width: image.size.height * scale,
-            height: image.size.height * scale
+            width: size.height * scale,
+            height: size.height * scale
         )
         let renderer = UIGraphicsImageRenderer(size: renderSize)
         return renderer.image { (context) in
-            image.draw(in: CGRect(origin: .zero, size: renderSize))
+            draw(in: CGRect(origin: .zero, size: renderSize))
         }
     }
 }

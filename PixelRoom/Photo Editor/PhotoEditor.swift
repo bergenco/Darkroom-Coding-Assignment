@@ -10,6 +10,7 @@ import UIKit
 protocol PhotoEditorModelProtocol: class {
     var currentPixellateInputScaleValue: Float { get }
     func editorDidChangePixellateInputScaleValue(to value: Float)
+    func storeEditedImage(_ image: UIImage?)
 }
 
 protocol PhotoEditorView: class {

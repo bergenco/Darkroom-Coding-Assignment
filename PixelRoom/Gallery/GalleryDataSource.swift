@@ -11,6 +11,8 @@ struct PhotoItem: Equatable {
     let name: String
     let thumbnail: UIImage
     let url: URL
+    
+    var edited: UIImage? = nil
 }
 
 enum GallerySectionStyle: CaseIterable {
@@ -50,14 +52,23 @@ class GalleryDataSource {
                 .compactMap {
                     let url = URL(fileURLWithPath: $0)
                     let name = url.deletingPathExtension().lastPathComponent
-                    
                     guard name.contains(Constants.bundledPhotoNameTag),
                           let data = try? Data(contentsOf: url),
                           let image = self?.createThumbnail(from: data) else {
                         return nil
                     }
                     
-                    return PhotoItem(name: name, thumbnail: image, url: url)
+                    let userDefaults = UserDefaults.standard
+                    
+                    var edited: UIImage?
+                    if let data = userDefaults.object(forKey: name) as? Data {
+                        let decoder = JSONDecoder()
+                        if let data = try? decoder.decode(EditedItem.self, from: data).data {
+                            edited = UIImage(data: data)
+                        }
+                    }
+                    
+                    return PhotoItem(name: name, thumbnail: image, url: url, edited: edited)
                 }.shuffled()
             
             let featuredItems = allItems.prefix(Constants.featuredCount)

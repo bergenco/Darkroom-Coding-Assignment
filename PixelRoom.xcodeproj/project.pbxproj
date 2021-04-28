@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		4E8D9FCA2639D0FE00E4C5A1 /* GalleryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E8D9FC92639D0FE00E4C5A1 /* GalleryTests.swift */; };
+		4E8D9FD22639DCA500E4C5A1 /* EditedItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E8D9FD12639DCA500E4C5A1 /* EditedItem.swift */; };
 		7819CC7F25ED42D8003B23F7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7819CC7E25ED42D8003B23F7 /* AppDelegate.swift */; };
 		7819CC8125ED42D8003B23F7 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7819CC8025ED42D8003B23F7 /* SceneDelegate.swift */; };
 		7819CC8825ED42DB003B23F7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7819CC8725ED42DB003B23F7 /* Assets.xcassets */; };
@@ -80,6 +81,7 @@
 
 /* Begin PBXFileReference section */
 		4E8D9FC92639D0FE00E4C5A1 /* GalleryTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GalleryTests.swift; sourceTree = "<group>"; };
+		4E8D9FD12639DCA500E4C5A1 /* EditedItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditedItem.swift; sourceTree = "<group>"; };
 		7819CC7B25ED42D8003B23F7 /* PixelRoom.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PixelRoom.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7819CC7E25ED42D8003B23F7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7819CC8025ED42D8003B23F7 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -280,6 +282,7 @@
 				7819CD3225ED9ADA003B23F7 /* PhotoEditorModel.swift */,
 				7819CCB525ED433F003B23F7 /* PhotoEditorViewController.swift */,
 				7819CD1E25ED7061003B23F7 /* PixellateFilter.swift */,
+				4E8D9FD12639DCA500E4C5A1 /* EditedItem.swift */,
 			);
 			path = "Photo Editor";
 			sourceTree = "<group>";
@@ -455,6 +458,7 @@
 				7819CCCD25ED433F003B23F7 /* GalleryViewController.swift in Sources */,
 				7819CCFD25ED4963003B23F7 /* GalleryCollectionViewCell.swift in Sources */,
 				7819CC7F25ED42D8003B23F7 /* AppDelegate.swift in Sources */,
+				4E8D9FD22639DCA500E4C5A1 /* EditedItem.swift in Sources */,
 				7819CD3325ED9ADA003B23F7 /* PhotoEditorModel.swift in Sources */,
 				7819CCCE25ED433F003B23F7 /* PhotoEditorViewController.swift in Sources */,
 				7819CD1F25ED7061003B23F7 /* PixellateFilter.swift in Sources */,

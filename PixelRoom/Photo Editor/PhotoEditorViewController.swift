@@ -34,6 +34,12 @@ class PhotoEditorViewController: UIViewController, PhotoEditorView {
         setupSubviews()
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        model?.storeEditedImage(imageView.image)
+    }
+    
     // MARK: - PhotoEditorView
     
     func setupWithModel(_ model: PhotoEditorModelProtocol) {
