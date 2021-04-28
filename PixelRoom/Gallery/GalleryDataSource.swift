@@ -67,7 +67,10 @@ class GalleryDataSource {
             self.featuredPhotos = GallerySection(style: .featured, items: Array(featuredItems))
             self.photos = GallerySection(style: .normal, items: allItems)
             self.featuredFooterPhotos = GallerySection(style: .featuredFooter, items: Array(footerItems))
-            completion()
+            
+            DispatchQueue.main.async {
+                completion()
+            }
         }
     }
 
