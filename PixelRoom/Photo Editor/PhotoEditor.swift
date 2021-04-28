@@ -8,8 +8,10 @@
 import UIKit
 
 protocol PhotoEditorModelProtocol: class {
-    var currentPixellateInputScaleValue: Float { get }
-    func editorDidChangePixellateInputScaleValue(to value: Float)
+    var currentFilterValue: Float { get }
+    var currentEffect: Filter.Effect { get }
+    func editorDidChangeFilterValue(to value: Float)
+    func editorDidChangeEffect(to value: Filter.Effect)
     func storeEditedImage(_ image: UIImage?)
 }
 

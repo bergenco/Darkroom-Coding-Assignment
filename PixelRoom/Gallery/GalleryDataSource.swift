@@ -7,13 +7,6 @@
 
 import UIKit
 
-struct PhotoItem: Equatable {
-    let name: String
-    let thumbnail: UIImage
-    let url: URL
-    
-    var edited: UIImage? = nil
-}
 
 enum GallerySectionStyle: CaseIterable {
     case featured
@@ -53,11 +46,11 @@ class GalleryDataSource {
                     let url = URL(fileURLWithPath: $0)
                     let name = url.deletingPathExtension().lastPathComponent
                     guard name.contains(Constants.bundledPhotoNameTag),
-                          let data = try? Data(contentsOf: url),
-                          let image = self?.createThumbnail(from: data) else {
+                          let data = try? Data(contentsOf: url) else {
                         return nil
                     }
                     
+                    let image = UIImage.thumbnail(from: data)
                     let userDefaults = UserDefaults.standard
                     
                     var edited: UIImage?
@@ -103,21 +96,4 @@ class GalleryDataSource {
         return allSections[section].items[index]
     }
     
-}
-
-// MARK: - Helpers
-
-extension GalleryDataSource {
-    
-    private func createThumbnail(from imageData: Data) -> UIImage {
-        let options = [
-            kCGImageSourceCreateThumbnailWithTransform: true,
-            kCGImageSourceCreateThumbnailFromImageAlways: true,
-            kCGImageSourceThumbnailMaxPixelSize: 150 * UIScreen.main.scale
-        ] as CFDictionary
-        let source = CGImageSourceCreateWithData(imageData as NSData, nil)!
-        let imageReference = CGImageSourceCreateThumbnailAtIndex(source, 0, options)!
-        let thumbnailImage = UIImage(cgImage: imageReference)
-        return thumbnailImage
-    }
 }

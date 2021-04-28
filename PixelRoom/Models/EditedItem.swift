@@ -12,4 +12,5 @@ struct EditedItem: Codable, Equatable {
     
     let data: Data
     let inputScale: Float
+    let effect: Filter.Effect
 }

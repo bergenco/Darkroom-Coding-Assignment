@@ -11,9 +11,10 @@ class PhotoEditorViewController: UIViewController, PhotoEditorView {
     
     private let stackView = UIStackView()
     private let imageView = UIImageView()
-    private let scaleSliderStackView = UIStackView()
+    private let filterSliderStackView = UIStackView()
     private let valueLabel = UILabel()
     private let scaleSlider = UISlider()
+    private let filterControl = UISegmentedControl(items: [Filter.Effect.pixellate.name, Filter.Effect.hexagonalPixellate.name, Filter.Effect.pointillize.name])
     private var model: PhotoEditorModelProtocol?
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
@@ -60,6 +61,7 @@ class PhotoEditorViewController: UIViewController, PhotoEditorView {
         setupScaleSlider()
         updateValueLabel()
         setupImageView()
+        setupFilterControl()
         setupLayout()
     }
     
@@ -69,7 +71,8 @@ class PhotoEditorViewController: UIViewController, PhotoEditorView {
         stackView.distribution = .fillProportionally
         stackView.spacing = 16
         stackView.addArrangedSubview(imageView)
-        stackView.addArrangedSubview(scaleSliderStackView)
+        stackView.addArrangedSubview(filterSliderStackView)
+        stackView.addArrangedSubview(filterControl)
     }
     
     private func setupImageView() {
@@ -78,20 +81,24 @@ class PhotoEditorViewController: UIViewController, PhotoEditorView {
     }
     
     private func setupScaleSlider() {
-        scaleSliderStackView.axis = .horizontal
-        scaleSliderStackView.alignment = .center
-        scaleSliderStackView.distribution = .fillProportionally
-        scaleSliderStackView.spacing = 16
-        scaleSliderStackView.addArrangedSubview(scaleSlider)
-        scaleSliderStackView.addArrangedSubview(valueLabel)
+        filterSliderStackView.axis = .horizontal
+        filterSliderStackView.alignment = .center
+        filterSliderStackView.distribution = .fillProportionally
+        filterSliderStackView.spacing = 16
+        filterSliderStackView.addArrangedSubview(scaleSlider)
+        filterSliderStackView.addArrangedSubview(valueLabel)
         scaleSlider.minimumValue = 1.0
         scaleSlider.maximumValue = 50.0
-        scaleSlider.value = model?.currentPixellateInputScaleValue ?? 1.0
+        scaleSlider.value = model?.currentFilterValue ?? 1.0
         scaleSlider.tintColor = .orange
         scaleSlider.thumbTintColor = .darkGray
         scaleSlider .addTarget(self, action: #selector(sliderChanged(_:)), for: .valueChanged)
     }
     
+    private func setupFilterControl() {
+        filterControl.selectedSegmentIndex = model?.currentEffect.rawValue ?? 0
+        filterControl .addTarget(self, action: #selector(filterChanged(_:)), for: .valueChanged)
+    }
     
     private func setupLayout() {
         stackView.translatesAutoresizingMaskIntoConstraints = false
@@ -101,21 +108,31 @@ class PhotoEditorViewController: UIViewController, PhotoEditorView {
             stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             stackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -32),
             imageView.widthAnchor.constraint(equalTo: stackView.widthAnchor),
-            scaleSliderStackView.widthAnchor.constraint(equalTo: stackView.widthAnchor, constant: -60),
-            scaleSliderStackView.heightAnchor.constraint(equalToConstant: 120),
-            valueLabel.widthAnchor.constraint(equalToConstant: 25)
+            filterSliderStackView.widthAnchor.constraint(equalTo: stackView.widthAnchor, constant: -60),
+            filterSliderStackView.heightAnchor.constraint(equalToConstant: 120),
+            valueLabel.widthAnchor.constraint(equalToConstant: 25),
+            filterControl.widthAnchor.constraint(equalTo: stackView.widthAnchor, constant: -60),
+            filterControl.heightAnchor.constraint(equalToConstant: 40),
         ])
     }
     
     @objc
     private func sliderChanged(_ slider: UISlider) {
         updateValueLabel()
-        model?.editorDidChangePixellateInputScaleValue(to: slider.value)
+        model?.editorDidChangeFilterValue(to: slider.value)
     }
    
     private func updateValueLabel() {
         let percentage = scaleSlider.value / (scaleSlider.maximumValue - scaleSlider.minimumValue) * 100;
         valueLabel.text = String(format: "%.0f%%", roundf(percentage))
+    }
+    
+    @objc
+    private func filterChanged(_ control: UISegmentedControl) {
+        let effect = Filter.Effect.init(rawValue: control.selectedSegmentIndex) ?? Filter.Effect.pixellate
+        model?.editorDidChangeEffect(to: effect)
+        scaleSlider.value = effect.minValue
+        updateValueLabel()
     }
 }
 

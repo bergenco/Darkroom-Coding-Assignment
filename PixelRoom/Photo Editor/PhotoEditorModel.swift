@@ -12,11 +12,12 @@ class PhotoEditorModel: PhotoEditorModelProtocol {
     private let item: PhotoItem
     private let view: PhotoEditorView
     private let inputImage: UIImage
-    private let pixellateFilter = PixellateFilter()
+    private let filter = Filter()
     
     private var currentlyFiltering: Bool = false
     private var pendingFilterUpdate: Bool = false
-    private var pixellateInputScaleValue: Float = PixellateFilter.minInputScale
+    private var filterValue: Float = PixellateFilter.minInputScale
+    private var effect: Filter.Effect = .pixellate
     
     init(with item: PhotoItem, photoEditorView: PhotoEditorView) {
         self.item = item
@@ -27,7 +28,7 @@ class PhotoEditorModel: PhotoEditorModelProtocol {
         
         // load edits and setup filter
         loadPixellateEdits()
-        let image = pixellateFilter.pixelate(image: inputImage, inputScale: pixellateInputScaleValue)
+        let image = filter.perform(currentEffect, on: inputImage, with: filterValue)
         photoEditorView.setFilteredImage(image ?? item.thumbnail)
     }
     
@@ -41,7 +42,7 @@ class PhotoEditorModel: PhotoEditorModelProtocol {
         }
         currentlyFiltering = true
         DispatchQueue.global().async {
-            let pixellated = self.pixellateFilter.pixelate(image: self.inputImage, inputScale: self.pixellateInputScaleValue)
+            let pixellated = self.filter.perform(self.effect, on: self.inputImage, with: self.filterValue)
             DispatchQueue.main.async {
                 if let pixellated = pixellated {
                     self.view.setFilteredImage(pixellated)
@@ -55,21 +56,32 @@ class PhotoEditorModel: PhotoEditorModelProtocol {
         }
     }
     
-    var currentPixellateInputScaleValue: Float {
-        return pixellateInputScaleValue
+    var currentFilterValue: Float {
+        return filterValue
     }
     
-    func editorDidChangePixellateInputScaleValue(to value: Float) {
-        guard pixellateInputScaleValue.rounded() != value.rounded() else { return }
+    var currentEffect: Filter.Effect {
+        return effect
+    }
+    
+    
+    func editorDidChangeFilterValue(to value: Float) {
+        guard filterValue.rounded() != value.rounded() else { return }
         
-        pixellateInputScaleValue = value
+        filterValue = value
+        applyPixellateFilter()
+    }
+    
+    func editorDidChangeEffect(to value: Filter.Effect) {
+        effect = value
+        filterValue = effect.minValue
         applyPixellateFilter()
     }
     
     func storeEditedImage(_ image: UIImage?) {
         let defaults = UserDefaults.standard
         
-        guard pixellateInputScaleValue != PixellateFilter.minInputScale else {
+        guard filterValue != currentEffect.minValue else {
             // Remove the edited item on initial scale
             defaults.setValue(nil, forKey: item.name)
             return
@@ -80,7 +92,7 @@ class PhotoEditorModel: PhotoEditorModelProtocol {
             return
         }
         
-        let editemItem = EditedItem(data: data, inputScale: pixellateInputScaleValue)
+        let editemItem = EditedItem(data: data, inputScale: filterValue, effect: effect)
         
         let encoder = JSONEncoder()
         if let encoded = try? encoder.encode(editemItem) {
@@ -95,35 +107,9 @@ class PhotoEditorModel: PhotoEditorModelProtocol {
         if let data = userDefaults.object(forKey: item.name) as? Data {
             let decoder = JSONDecoder()
             if let editedItem = try? decoder.decode(EditedItem.self, from: data) {
-                pixellateInputScaleValue = editedItem.inputScale
+                filterValue = editedItem.inputScale
+                effect = editedItem.effect
             }
-        }
-    }
-}
-
-// MARK: - Helpers
-
-extension UIImage {
-    static func resizedImage(from url: URL) -> UIImage? {
-        
-        guard let image = UIImage(contentsOfFile: url.path) else {
-            return nil
-        }
-        
-        return image.resized()
-    }
-    
-    func resized() -> UIImage {
-        let maxSize = UIScreen.main.bounds.size
-        
-        let scale = max(maxSize.width / size.width, maxSize.height / size.height)
-        let renderSize = CGSize(
-            width: size.height * scale,
-            height: size.height * scale
-        )
-        let renderer = UIGraphicsImageRenderer(size: renderSize)
-        return renderer.image { (context) in
-            draw(in: CGRect(origin: .zero, size: renderSize))
         }
     }
 }
