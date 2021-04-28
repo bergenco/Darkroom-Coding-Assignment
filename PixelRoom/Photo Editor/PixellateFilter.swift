@@ -8,6 +8,9 @@
 import UIKit
 
 class PixellateFilter {
+    
+    static let minInputScale: Float = 1.0
+    
     private let context = CIContext()
     private let internalFilter = CIFilter(name: "CIPixellate")
 

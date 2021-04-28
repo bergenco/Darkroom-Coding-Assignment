@@ -16,7 +16,7 @@ class PhotoEditorModel: PhotoEditorModelProtocol {
     
     private var currentlyFiltering: Bool = false
     private var pendingFilterUpdate: Bool = false
-    private var pixellateInputScaleValue: Float = 0.0
+    private var pixellateInputScaleValue: Float = PixellateFilter.minInputScale
     
     init(with item: PhotoItem, photoEditorView: PhotoEditorView) {
         self.item = item
@@ -73,8 +73,13 @@ class PhotoEditorModel: PhotoEditorModelProtocol {
     
     func loadPixellateEdits() {
         let userDefaults = UserDefaults.standard
-        pixellateInputScaleValue = userDefaults.float(forKey: "inputScale")
         
+        if userDefaults.object(forKey: "inputScale") == nil {
+            pixellateInputScaleValue = PixellateFilter.minInputScale
+            userDefaults.setValue(PixellateFilter.minInputScale, forKey: "inputScale")
+        } else {
+            pixellateInputScaleValue = userDefaults.float(forKey: "inputScale")
+        }
     }
 }
 
