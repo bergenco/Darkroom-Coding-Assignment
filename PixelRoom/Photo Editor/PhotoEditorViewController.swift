@@ -50,6 +50,11 @@ class PhotoEditorViewController: UIViewController, PhotoEditorView {
     
     private func setupSubviews() {
         title = "PixelRoom"
+        navigationItem.rightBarButtonItem = UIBarButtonItem(
+            barButtonSystemItem: .action,
+            target: self,
+            action: #selector(self.sharePhoto(_:))
+        )
         view.backgroundColor = .black
         view.addSubview(stackView)
         setupStackView()
@@ -121,6 +126,14 @@ class PhotoEditorViewController: UIViewController, PhotoEditorView {
         let percentage = scaleSlider.value / (scaleSlider.maximumValue - scaleSlider.minimumValue) * 100;
         valueLabel.text = String(format: "%.0f%%", roundf(percentage))
     }
+    
+    @objc
+    private func sharePhoto(_ sender: Any) {
+        if let filteredImage = imageView.image {
+            present(UIActivityViewController(
+                activityItems: [filteredImage],
+                applicationActivities: nil
+            ), animated: true)
+        }
+    }
 }
-
-
