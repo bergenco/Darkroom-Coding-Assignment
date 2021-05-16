@@ -37,6 +37,8 @@ class GalleryDataSource {
     private var featuredFooterPhotos = GallerySection(style: .featuredFooter, items: [])
     private var photos = GallerySection(style: .normal, items: [])
     
+    private let pixellateFilter = PixellateFilter()
+    
     private var allSections: [GallerySection] {
         return [featuredPhotos, featuredFooterPhotos, photos]
     }
@@ -45,6 +47,7 @@ class GalleryDataSource {
     
     public func reloadPhotos(completion: @escaping ()->Void) {
         DispatchQueue.global(qos: .userInitiated).async {
+            let edits = UserDefaults.standard.photoEdits()
             var allItems: [PhotoItem] = Constants.supportedFileTypes
                 .flatMap { Bundle.main.paths(forResourcesOfType: $0, inDirectory: nil) }
                 .compactMap {
@@ -54,7 +57,19 @@ class GalleryDataSource {
                           let data = try? Data(contentsOf: url) else {
                         return nil
                     }
-                    return PhotoItem(name: name, thumbnail: self.createThumbnail(from: data), url: url)
+                    let (thumbnail, thumbnailScale) = self.createThumbnail(from: data)
+                    
+                    if let edits = edits,
+                       let thumbnailScale = thumbnailScale,
+                       let scaleValue = edits[name] as? Float,
+                       let pixellated = self.pixellateFilter.pixelate(
+                        image: thumbnail,
+                        inputScale: thumbnailScale * scaleValue
+                       ) {
+                        return PhotoItem(name: name, thumbnail: pixellated, url: url)
+                    }
+                    
+                    return PhotoItem(name: name, thumbnail: thumbnail, url: url)
                 }.shuffled()
             
             let featuredItems = allItems.prefix(Constants.featuredCount)
@@ -91,16 +106,26 @@ class GalleryDataSource {
 // MARK: - Helpers
 
 extension GalleryDataSource {
-    
-    private func createThumbnail(from imageData: Data) -> UIImage {
+    private func createThumbnail(from imageData: Data) -> (thumbnail: UIImage, thumbnailScale: Float?) {
         let options = [
             kCGImageSourceCreateThumbnailWithTransform: true,
             kCGImageSourceCreateThumbnailFromImageAlways: true,
             kCGImageSourceThumbnailMaxPixelSize: 150 * UIScreen.main.scale
         ] as CFDictionary
         let source = CGImageSourceCreateWithData(imageData as NSData, nil)!
+        
         let imageReference = CGImageSourceCreateThumbnailAtIndex(source, 0, options)!
         let thumbnailImage = UIImage(cgImage: imageReference)
-        return thumbnailImage
+        
+        if let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, [kCGImageSourceShouldCache: false] as CFDictionary) as? [CFString: Any],
+           let width = properties[kCGImagePropertyPixelWidth] as? CGFloat,
+           let height = properties[kCGImagePropertyPixelHeight] as? CGFloat {
+            let thumbnailScale = min(
+                Float((thumbnailImage.size.width * thumbnailImage.scale) / width),
+                Float((thumbnailImage.size.height * thumbnailImage.scale) / height)
+            )
+            return (thumbnailImage, thumbnailScale)
+        }
+        return (thumbnailImage, nil)
     }
 }
