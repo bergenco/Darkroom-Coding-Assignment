@@ -8,15 +8,15 @@
 import UIKit
 
 class PhotoEditorModel: PhotoEditorModelProtocol {
-    
     private let item: PhotoItem
     private let view: PhotoEditorView
     private let inputImage: UIImage
-    private let pixellateFilter = PixellateFilter()
+    private let filter = Filter()
     
     private var currentlyFiltering: Bool = false
     private var pendingFilterUpdate: Bool = false
-    private var pixellateInputScaleValue: Float = 0.0
+    private var filterType: Filter.FilterType = .pointillize
+    private var inputScaleValue: Float = 0.0
     
     init(with item: PhotoItem, photoEditorView: PhotoEditorView) {
         self.item = item
@@ -26,50 +26,62 @@ class PhotoEditorModel: PhotoEditorModelProtocol {
         self.inputImage = UIImage.resizedImage(from: item.url) ?? item.thumbnail
         
         // load edits and setup filter
-        loadPixellateEdits()
-        let image = pixellateFilter.pixelate(image: inputImage, inputScale: pixellateInputScaleValue)
+        loadFilterEdits()
+        let image = filter.apply(filterType, to: inputImage, inputScale: inputScaleValue)
         photoEditorView.setFilteredImage(image ?? item.thumbnail)
     }
     
     
     /// `currentlyFiltering` and `pendingFilterUpdate` are used to make sure we don't slow down
     /// the editing experience or block the user interface with too many updates.
-    private func applyPixellateFilter() {
+    private func applyFilter() {
         guard !currentlyFiltering else {
             pendingFilterUpdate = true
             return
         }
         currentlyFiltering = true
         DispatchQueue.global().async {
-            let pixellated = self.pixellateFilter.pixelate(image: self.inputImage, inputScale: self.pixellateInputScaleValue)
+            let filtered = self.filter.apply(
+                self.filterType,
+                to: self.inputImage,
+                inputScale: self.inputScaleValue
+            )
             DispatchQueue.main.async {
-                if let pixellated = pixellated {
-                    self.view.setFilteredImage(pixellated)
+                if let filtered = filtered {
+                    self.view.setFilteredImage(filtered)
                     self.currentlyFiltering = false
                     if self.pendingFilterUpdate {
                         self.pendingFilterUpdate = false
-                        self.applyPixellateFilter()
+                        self.applyFilter()
                     }
                 }
             }
         }
     }
     
-    var currentPixellateInputScaleValue: Float {
-        return pixellateInputScaleValue
+    var currentFilterType: Filter.FilterType {
+        return filterType
+    }
+
+    var currentInputScaleValue: Float {
+        return inputScaleValue
+    }
+        
+    func editorDidChangeFilter(to filterType: Filter.FilterType, scaleValue: Float) {
+        self.filterType = filterType
+        self.inputScaleValue = scaleValue
+        storeFilterEdits()
+        applyFilter()
     }
     
-    func editorDidChangePixellateInputScaleValue(to value: Float) {
-        pixellateInputScaleValue = value
-        storePixellateEdits()
-        applyPixellateFilter()
-    }
-    
-    func storePixellateEdits() {
+    func storeFilterEdits() {
         let id = item.url.deletingPathExtension().lastPathComponent
         var edits = UserDefaults.standard.photoEdits() ?? [:]
-        if pixellateInputScaleValue > 0 {
-            edits.updateValue(pixellateInputScaleValue, forKey: id)
+        if inputScaleValue > 0 {
+            let edit = PhotoEdit(scaleValue: inputScaleValue, filterType: filterType)
+            if let editData = try? JSONEncoder().encode(edit) {
+                edits.updateValue(editData, forKey: id)
+            }
         } else {
             edits.removeValue(forKey: id)
         }
@@ -77,11 +89,13 @@ class PhotoEditorModel: PhotoEditorModelProtocol {
         UserDefaults.standard.synchronize()
     }
     
-    func loadPixellateEdits() {
+    func loadFilterEdits() {
         let id = item.url.deletingPathExtension().lastPathComponent
         if let edits = UserDefaults.standard.photoEdits(),
-           let scaleValue = edits[id] as? Float {
-            pixellateInputScaleValue = scaleValue
+           let editData = edits[id] as? Data,
+           let edit = try? JSONDecoder().decode(PhotoEdit.self, from: editData) {
+            filterType = edit.filterType
+            inputScaleValue = edit.scaleValue
         }
     }
 }

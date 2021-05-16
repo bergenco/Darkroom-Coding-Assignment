@@ -1,5 +1,5 @@
 //
-//  PixellateFilter.swift
+//  Filter.swift
 //  PixelRoom
 //
 //  Created by Igor Lipovac on 01/03/2021.
@@ -7,13 +7,23 @@
 
 import UIKit
 
-class PixellateFilter {
+class Filter {
+    enum FilterType: Int, Codable {
+        case pixellate
+        case hexagonalPixellate
+        case pointillize
+    }
+    
     private let context = CIContext()
-    private let internalFilter = CIFilter(name: "CIPixellate")
-
-    func pixelate(image: UIImage, inputScale: Float) -> UIImage? {
+    private let filters: [FilterType: CIFilter?] = [
+        .pixellate: CIFilter(name: "CIPixellate"),
+        .hexagonalPixellate: CIFilter(name: "CIHexagonalPixellate"),
+        .pointillize: CIFilter(name: "CIPointillize")
+    ]
+    
+    func apply(_ filterType: FilterType, to image: UIImage, inputScale: Float) -> UIImage? {
         guard let inputCGImage = image.cgImage,
-              let filter = internalFilter else {
+              let filter = filters[filterType] ?? nil else {
             return nil
         }
         
@@ -23,7 +33,10 @@ class PixellateFilter {
         let center = CGPoint(x: inputImage.extent.width / 2, y: inputImage.extent.height / 2)
         filter.setValue(inputImage, forKey: kCIInputImageKey)
         filter.setValue(CIVector(cgPoint: center), forKey: "inputCenter")
-        filter.setValue(NSNumber(value: inputScale), forKey: "inputScale")
+        filter.setValue(
+            NSNumber(value: inputScale),
+            forKey: filterType == .pointillize ? "inputRadius" : "inputScale"
+        )
         
         guard let outputImage = filter.outputImage else { return nil }
         

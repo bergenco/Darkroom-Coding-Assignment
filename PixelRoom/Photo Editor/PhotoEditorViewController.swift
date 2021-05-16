@@ -38,7 +38,7 @@ class PhotoEditorViewController: UIViewController, PhotoEditorView {
     
     func setupWithModel(_ model: PhotoEditorModelProtocol) {
         self.model = model
-        scaleSlider.value = model.currentPixellateInputScaleValue
+        scaleSlider.value = model.currentInputScaleValue
         updateValueLabel()
     }
     
@@ -92,7 +92,7 @@ class PhotoEditorViewController: UIViewController, PhotoEditorView {
         scaleSliderStackView.addArrangedSubview(valueLabel)
         scaleSlider.minimumValue = 0.0
         scaleSlider.maximumValue = 50.0
-        scaleSlider.value = model?.currentPixellateInputScaleValue ?? 0.0
+        scaleSlider.value = model?.currentInputScaleValue ?? 0.0
         scaleSlider.tintColor = .orange
         scaleSlider.thumbTintColor = .darkGray
         scaleSlider .addTarget(self, action: #selector(sliderChanged(_:)), for: .valueChanged)
@@ -119,7 +119,7 @@ class PhotoEditorViewController: UIViewController, PhotoEditorView {
     @objc
     private func sliderChanged(_ slider: UISlider) {
         updateValueLabel()
-        model?.editorDidChangePixellateInputScaleValue(to: slider.value)
+        model?.editorDidChangeFilter(to: .pixellate, scaleValue: slider.value)
     }
    
     private func updateValueLabel() {

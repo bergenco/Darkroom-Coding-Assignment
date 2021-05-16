@@ -14,6 +14,11 @@ struct PhotoItem: Equatable {
     let url: URL
 }
 
+struct PhotoEdit: Codable {
+    let scaleValue: Float
+    let filterType: Filter.FilterType
+}
+
 enum GallerySectionStyle {
     case featured
     case normal
