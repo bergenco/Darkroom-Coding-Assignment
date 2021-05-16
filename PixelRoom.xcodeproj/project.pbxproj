@@ -47,7 +47,7 @@
 		7819CD1025ED518A003B23F7 /* elijah-hiett-jlAWAleaAZE-unsplash.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 7819CD0725ED518A003B23F7 /* elijah-hiett-jlAWAleaAZE-unsplash.jpg */; };
 		7819CD1125ED518A003B23F7 /* redcharlie-l8hdir8d02A-unsplash.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 7819CD0825ED518A003B23F7 /* redcharlie-l8hdir8d02A-unsplash.jpg */; };
 		7819CD1225ED518A003B23F7 /* pawel-czerwinski-e_Jx2K_hIpk-unsplash.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 7819CD0925ED518A003B23F7 /* pawel-czerwinski-e_Jx2K_hIpk-unsplash.jpg */; };
-		7819CD1F25ED7061003B23F7 /* PixellateFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7819CD1E25ED7061003B23F7 /* PixellateFilter.swift */; };
+		7819CD1F25ED7061003B23F7 /* Filter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7819CD1E25ED7061003B23F7 /* Filter.swift */; };
 		7819CD2925ED8FBF003B23F7 /* jens-johnsson-q5miLeBhCXY-unsplash.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 7819CD2325ED8FBF003B23F7 /* jens-johnsson-q5miLeBhCXY-unsplash.jpg */; };
 		7819CD2A25ED8FBF003B23F7 /* cristina-gottardi-MqGlGvkGBUI-unsplash.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 7819CD2425ED8FBF003B23F7 /* cristina-gottardi-MqGlGvkGBUI-unsplash.jpg */; };
 		7819CD2B25ED8FBF003B23F7 /* surface-tJEsiCVE-TU-unsplash.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 7819CD2525ED8FBF003B23F7 /* surface-tJEsiCVE-TU-unsplash.jpg */; };
@@ -124,7 +124,7 @@
 		7819CD0725ED518A003B23F7 /* elijah-hiett-jlAWAleaAZE-unsplash.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "elijah-hiett-jlAWAleaAZE-unsplash.jpg"; sourceTree = "<group>"; };
 		7819CD0825ED518A003B23F7 /* redcharlie-l8hdir8d02A-unsplash.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "redcharlie-l8hdir8d02A-unsplash.jpg"; sourceTree = "<group>"; };
 		7819CD0925ED518A003B23F7 /* pawel-czerwinski-e_Jx2K_hIpk-unsplash.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "pawel-czerwinski-e_Jx2K_hIpk-unsplash.jpg"; sourceTree = "<group>"; };
-		7819CD1E25ED7061003B23F7 /* PixellateFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixellateFilter.swift; sourceTree = "<group>"; };
+		7819CD1E25ED7061003B23F7 /* Filter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Filter.swift; sourceTree = "<group>"; };
 		7819CD2325ED8FBF003B23F7 /* jens-johnsson-q5miLeBhCXY-unsplash.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "jens-johnsson-q5miLeBhCXY-unsplash.jpg"; sourceTree = "<group>"; };
 		7819CD2425ED8FBF003B23F7 /* cristina-gottardi-MqGlGvkGBUI-unsplash.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "cristina-gottardi-MqGlGvkGBUI-unsplash.jpg"; sourceTree = "<group>"; };
 		7819CD2525ED8FBF003B23F7 /* surface-tJEsiCVE-TU-unsplash.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "surface-tJEsiCVE-TU-unsplash.jpg"; sourceTree = "<group>"; };
@@ -276,7 +276,7 @@
 				7819CD3725EDA375003B23F7 /* PhotoEditor.swift */,
 				7819CD3225ED9ADA003B23F7 /* PhotoEditorModel.swift */,
 				7819CCB525ED433F003B23F7 /* PhotoEditorViewController.swift */,
-				7819CD1E25ED7061003B23F7 /* PixellateFilter.swift */,
+				7819CD1E25ED7061003B23F7 /* Filter.swift */,
 			);
 			path = "Photo Editor";
 			sourceTree = "<group>";
@@ -454,7 +454,7 @@
 				7819CC7F25ED42D8003B23F7 /* AppDelegate.swift in Sources */,
 				7819CD3325ED9ADA003B23F7 /* PhotoEditorModel.swift in Sources */,
 				7819CCCE25ED433F003B23F7 /* PhotoEditorViewController.swift in Sources */,
-				7819CD1F25ED7061003B23F7 /* PixellateFilter.swift in Sources */,
+				7819CD1F25ED7061003B23F7 /* Filter.swift in Sources */,
 				7819CCCF25ED433F003B23F7 /* GalleryDataSource.swift in Sources */,
 				7819CC8125ED42D8003B23F7 /* SceneDelegate.swift in Sources */,
 			);
