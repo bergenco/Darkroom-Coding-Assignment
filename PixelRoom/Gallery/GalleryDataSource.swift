@@ -10,6 +10,7 @@ import UIKit
 struct PhotoItem: Equatable {
     let name: String
     let thumbnail: UIImage
+    let edited: Bool
     let url: URL
 }
 
@@ -66,10 +67,10 @@ class GalleryDataSource {
                         image: thumbnail,
                         inputScale: thumbnailScale * scaleValue
                        ) {
-                        return PhotoItem(name: name, thumbnail: pixellated, url: url)
+                        return PhotoItem(name: name, thumbnail: pixellated, edited: true, url: url)
                     }
                     
-                    return PhotoItem(name: name, thumbnail: thumbnail, url: url)
+                    return PhotoItem(name: name, thumbnail: thumbnail, edited: false, url: url)
                 }.shuffled()
             
             let featuredItems = allItems.prefix(Constants.featuredCount)

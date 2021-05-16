@@ -114,7 +114,7 @@ extension GalleryViewController: UICollectionViewDelegate, UICollectionViewDataS
         let item = photoDataSource.item(at: indexPath.row, inSection: indexPath.section)
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constants.cellIdentifier, for: indexPath)
         if let photoCell = cell as? GalleryCollectionViewCell {
-            photoCell.configure(with: item.thumbnail)
+            photoCell.configure(with: item)
             return photoCell
         }
         return cell
