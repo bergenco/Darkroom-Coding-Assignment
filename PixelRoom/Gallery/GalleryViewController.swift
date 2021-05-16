@@ -20,6 +20,8 @@ class GalleryViewController: UIViewController {
     private let collectionView: UICollectionView
     private let activityIndicator = UIActivityIndicatorView(style: .large)
     
+    private var lastSelection: IndexPath? = nil
+    
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         fatalError("Not implemented. Use `init()`")
     }
@@ -121,6 +123,7 @@ extension GalleryViewController: UICollectionViewDelegate, UICollectionViewDataS
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        lastSelection = indexPath
         let item = photoDataSource.item(at: indexPath.row, inSection: indexPath.section)
         let editor = PhotoEditorViewController()
         let model = PhotoEditorModel(with: item, photoEditorView: editor)
@@ -129,6 +132,13 @@ extension GalleryViewController: UICollectionViewDelegate, UICollectionViewDataS
         collectionView.deselectItem(at: indexPath, animated: true)
     }
     
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if let lastSelection = self.lastSelection {
+            self.collectionView.reloadItems(at: [lastSelection])
+        }
+    }
 }
 
 // MARK: - UICollectionViewDelegateFlowLayout

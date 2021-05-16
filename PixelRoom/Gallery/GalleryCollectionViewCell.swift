@@ -10,6 +10,8 @@ import UIKit
 class GalleryCollectionViewCell: UICollectionViewCell {
     let photoView = UIImageView()
     let editedView = UIImageView(image: UIImage(named: "icon-edit"))
+    
+    private let pixellateFilter = PixellateFilter()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -49,8 +51,19 @@ class GalleryCollectionViewCell: UICollectionViewCell {
     }
       
     func configure(with item: PhotoItem) {
-        photoView.image = item.thumbnail
-        editedView.isHidden = !item.edited
+        if let edits = UserDefaults.standard.photoEdits(),
+           let thumbnailScale = item.thumbnailScale,
+           let scaleValue = edits[item.url.deletingPathExtension().lastPathComponent] as? Float,
+           let pixellated = self.pixellateFilter.pixelate(
+            image: item.thumbnail,
+            inputScale: thumbnailScale * scaleValue
+           ) {
+            photoView.image = pixellated
+            editedView.isHidden = false
+        } else {
+            photoView.image = item.thumbnail
+            editedView.isHidden = true
+        }
     }
     
     override var isSelected: Bool {

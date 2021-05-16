@@ -10,7 +10,7 @@ import UIKit
 struct PhotoItem: Equatable {
     let name: String
     let thumbnail: UIImage
-    let edited: Bool
+    let thumbnailScale: Float?
     let url: URL
 }
 
@@ -38,8 +38,6 @@ class GalleryDataSource {
     private var featuredFooterPhotos = GallerySection(style: .featuredFooter, items: [])
     private var photos = GallerySection(style: .normal, items: [])
     
-    private let pixellateFilter = PixellateFilter()
-    
     private var allSections: [GallerySection] {
         return [featuredPhotos, featuredFooterPhotos, photos]
     }
@@ -48,7 +46,6 @@ class GalleryDataSource {
     
     public func reloadPhotos(completion: @escaping ()->Void) {
         DispatchQueue.global(qos: .userInitiated).async {
-            let edits = UserDefaults.standard.photoEdits()
             var allItems: [PhotoItem] = Constants.supportedFileTypes
                 .flatMap { Bundle.main.paths(forResourcesOfType: $0, inDirectory: nil) }
                 .compactMap {
@@ -60,17 +57,12 @@ class GalleryDataSource {
                     }
                     let (thumbnail, thumbnailScale) = self.createThumbnail(from: data)
                     
-                    if let edits = edits,
-                       let thumbnailScale = thumbnailScale,
-                       let scaleValue = edits[name] as? Float,
-                       let pixellated = self.pixellateFilter.pixelate(
-                        image: thumbnail,
-                        inputScale: thumbnailScale * scaleValue
-                       ) {
-                        return PhotoItem(name: name, thumbnail: pixellated, edited: true, url: url)
-                    }
-                    
-                    return PhotoItem(name: name, thumbnail: thumbnail, edited: false, url: url)
+                    return PhotoItem(
+                        name: name,
+                        thumbnail: thumbnail,
+                        thumbnailScale: thumbnailScale,
+                        url: url
+                    )
                 }.shuffled()
             
             let featuredItems = allItems.prefix(Constants.featuredCount)
@@ -121,9 +113,11 @@ extension GalleryDataSource {
         if let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, [kCGImageSourceShouldCache: false] as CFDictionary) as? [CFString: Any],
            let width = properties[kCGImagePropertyPixelWidth] as? CGFloat,
            let height = properties[kCGImagePropertyPixelHeight] as? CGFloat {
+            let maxSize = UIScreen.main.bounds.size
+            let scale = max(maxSize.width / width, maxSize.height / height) * UIScreen.main.scale
             let thumbnailScale = min(
-                Float((thumbnailImage.size.width * thumbnailImage.scale) / width),
-                Float((thumbnailImage.size.height * thumbnailImage.scale) / height)
+                Float((thumbnailImage.size.width * thumbnailImage.scale) / (width * scale)),
+                Float((thumbnailImage.size.height * thumbnailImage.scale) / (height * scale))
             )
             return (thumbnailImage, thumbnailScale)
         }
