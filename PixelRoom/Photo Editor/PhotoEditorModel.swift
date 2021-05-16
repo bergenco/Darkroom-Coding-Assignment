@@ -66,19 +66,37 @@ class PhotoEditorModel: PhotoEditorModelProtocol {
     }
     
     func storePixellateEdits() {
-        let userDefaults = UserDefaults.standard
-        userDefaults.setValue(pixellateInputScaleValue, forKey: "inputScale")
-        userDefaults.synchronize()
+        let id = item.url.deletingPathExtension().lastPathComponent
+        var edits = UserDefaults.standard.photoEdits() ?? [:]
+        if pixellateInputScaleValue > 0 {
+            edits.updateValue(pixellateInputScaleValue, forKey: id)
+        } else {
+            edits.removeValue(forKey: id)
+        }
+        UserDefaults.standard.setPhotoEdits(edits)
+        UserDefaults.standard.synchronize()
     }
     
     func loadPixellateEdits() {
-        let userDefaults = UserDefaults.standard
-        pixellateInputScaleValue = userDefaults.float(forKey: "inputScale")
-        
+        let id = item.url.deletingPathExtension().lastPathComponent
+        if let edits = UserDefaults.standard.photoEdits(),
+           let scaleValue = edits[id] as? Float {
+            pixellateInputScaleValue = scaleValue
+        }
     }
 }
 
 // MARK: - Helpers
+
+extension UserDefaults {
+    func photoEdits() -> [String: Any]? {
+        return self.dictionary(forKey: "photoEdits")
+    }
+    
+    func setPhotoEdits(_ edits: [String: Any]) {
+        self.set(edits, forKey: "photoEdits")
+    }
+}
 
 extension UIImage {
     static func resizedImage(from url: URL) -> UIImage? {
