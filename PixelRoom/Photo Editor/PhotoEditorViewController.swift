@@ -53,6 +53,7 @@ class PhotoEditorViewController: UIViewController, PhotoEditorView {
         view.backgroundColor = .black
         view.addSubview(stackView)
         setupStackView()
+        setupValueLabel()
         updateValueLabel()
         setupScaleSlider()
         setupImageView()
@@ -73,6 +74,10 @@ class PhotoEditorViewController: UIViewController, PhotoEditorView {
         imageView.contentMode = .scaleAspectFit
     }
     
+    private func setupValueLabel() {
+        valueLabel.textAlignment = .right
+    }
+    
     private func setupScaleSlider() {
         scaleSliderStackView.axis = .horizontal
         scaleSliderStackView.alignment = .center
@@ -90,6 +95,9 @@ class PhotoEditorViewController: UIViewController, PhotoEditorView {
     
     
     private func setupLayout() {
+        let labelSize = ("100%" as NSString).size(
+            withAttributes: [NSAttributedString.Key.font: self.valueLabel.font ?? .systemFont(ofSize: 17)]
+        )
         stackView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -99,7 +107,7 @@ class PhotoEditorViewController: UIViewController, PhotoEditorView {
             imageView.widthAnchor.constraint(equalTo: stackView.widthAnchor),
             scaleSliderStackView.widthAnchor.constraint(equalTo: stackView.widthAnchor, constant: -60),
             scaleSliderStackView.heightAnchor.constraint(equalToConstant: 120),
-            valueLabel.widthAnchor.constraint(equalToConstant: 25)
+            valueLabel.widthAnchor.constraint(equalToConstant: labelSize.width)
         ])
     }
     
