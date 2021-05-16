@@ -148,7 +148,7 @@ class PhotoEditorViewController: UIViewController, PhotoEditorView {
     }
     
     @objc
-    func segmentedControlChanged(_ segmentedControl: UISegmentedControl) {
+    private func segmentedControlChanged(_ segmentedControl: UISegmentedControl) {
         if let filterType = Filter.FilterType(rawValue: segmentedControl.selectedSegmentIndex) {
             model?.editorDidChangeFilter(to: filterType, scaleValue: scaleSlider.value)
         }
