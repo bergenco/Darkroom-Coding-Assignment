@@ -67,7 +67,7 @@ class PhotoEditorModel: PhotoEditorModelProtocol {
     
     func storePixellateEdits() {
         let userDefaults = UserDefaults.standard
-        userDefaults.setValue(pixellateInputScaleValue, forKey: "inputscale")
+        userDefaults.setValue(pixellateInputScaleValue, forKey: "inputScale")
         userDefaults.synchronize()
     }
     
