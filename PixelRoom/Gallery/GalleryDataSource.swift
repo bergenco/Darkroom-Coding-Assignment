@@ -44,18 +44,17 @@ class GalleryDataSource {
     // MARK: - Public
     
     public func reloadPhotos(completion: @escaping ()->Void) {
-        DispatchQueue.global(qos: .background).async {
+        DispatchQueue.global(qos: .userInitiated).async {
             var allItems: [PhotoItem] = Constants.supportedFileTypes
                 .flatMap { Bundle.main.paths(forResourcesOfType: $0, inDirectory: nil) }
                 .compactMap {
                     let url = URL(fileURLWithPath: $0)
                     let name = url.deletingPathExtension().lastPathComponent
                     guard name.contains(Constants.bundledPhotoNameTag),
-                          let data = try? Data(contentsOf: url),
-                          let image = UIImage(data: data) else {
+                          let data = try? Data(contentsOf: url) else {
                         return nil
                     }
-                    return PhotoItem(name: name, thumbnail: image, url: url)
+                    return PhotoItem(name: name, thumbnail: self.createThumbnail(from: data), url: url)
                 }.shuffled()
             
             let featuredItems = allItems.prefix(Constants.featuredCount)
@@ -67,7 +66,7 @@ class GalleryDataSource {
             self.featuredPhotos = GallerySection(style: .featured, items: Array(featuredItems))
             self.photos = GallerySection(style: .normal, items: allItems)
             self.featuredFooterPhotos = GallerySection(style: .featuredFooter, items: Array(footerItems))
-            completion()
+            DispatchQueue.main.async { completion() }
         }
     }
 
