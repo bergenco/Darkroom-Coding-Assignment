@@ -45,7 +45,7 @@ class GalleryViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         if let lastSelection = self.lastSelection {
-            self.collectionView.reloadItems(at: [lastSelection])
+            collectionView.reloadItems(at: [lastSelection])
         }
     }
 

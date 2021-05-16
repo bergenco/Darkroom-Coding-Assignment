@@ -15,7 +15,7 @@ class PhotoEditorModel: PhotoEditorModelProtocol {
     
     private var currentlyFiltering: Bool = false
     private var pendingFilterUpdate: Bool = false
-    private var filterType: Filter.FilterType = .pointillize
+    private var filterType: Filter.FilterType = .pixellate
     private var inputScaleValue: Float = 0.0
     
     init(with item: PhotoItem, photoEditorView: PhotoEditorView) {
@@ -104,11 +104,11 @@ class PhotoEditorModel: PhotoEditorModelProtocol {
 
 extension UserDefaults {
     func photoEdits() -> [String: Any]? {
-        return self.dictionary(forKey: "photoEdits")
+        return dictionary(forKey: "photoEdits")
     }
     
     func setPhotoEdits(_ edits: [String: Any]) {
-        self.set(edits, forKey: "photoEdits")
+        set(edits, forKey: "photoEdits")
     }
 }
 

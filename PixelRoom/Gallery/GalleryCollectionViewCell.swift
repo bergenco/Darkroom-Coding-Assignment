@@ -55,7 +55,7 @@ class GalleryCollectionViewCell: UICollectionViewCell {
            let thumbnailScale = item.thumbnailScale,
            let editData = edits[item.url.deletingPathExtension().lastPathComponent] as? Data,
            let edit = try? JSONDecoder().decode(PhotoEdit.self, from: editData),
-           let filtered = self.filter.apply(
+           let filtered = filter.apply(
             edit.filterType,
             to: item.thumbnail,
             inputScale: thumbnailScale * edit.scaleValue
