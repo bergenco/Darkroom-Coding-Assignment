@@ -16,8 +16,7 @@ class GalleryViewController: UIViewController {
     }
 
     private let photoDataSource: GalleryDataSource
-    private let flowLayout: UICollectionViewFlowLayout
-    private let collectionView: UICollectionView
+    private var collectionView: UICollectionView!
     private let activityIndicator = UIActivityIndicatorView(style: .large)
     
     private var lastSelection: IndexPath? = nil
@@ -32,9 +31,8 @@ class GalleryViewController: UIViewController {
     
     init() {
         photoDataSource = GalleryDataSource()
-        flowLayout = UICollectionViewFlowLayout()
-        collectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
         super.init(nibName: nil, bundle: nil)
+        collectionView = UICollectionView(frame: .zero, collectionViewLayout: makeCollectionViewLayout())
     }
     
     override func viewDidLoad() {
@@ -42,6 +40,13 @@ class GalleryViewController: UIViewController {
         setupSubviews()
         setupLayout()
         reloadData()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if let lastSelection = self.lastSelection {
+            self.collectionView.reloadItems(at: [lastSelection])
+        }
     }
 
     // MARK: - Subviews and Layout
@@ -65,14 +70,6 @@ class GalleryViewController: UIViewController {
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.register(GalleryCollectionViewCell.self, forCellWithReuseIdentifier: Constants.cellIdentifier)
-        setupCollectionViewLayout()
-    }
-    
-    private func setupCollectionViewLayout() {
-        flowLayout.minimumInteritemSpacing = Constants.interitemSpacing
-        flowLayout.minimumLineSpacing = Constants.interitemSpacing
-        flowLayout.scrollDirection = .vertical
-        flowLayout.sectionInset = UIEdgeInsets(top: Constants.sectionSpacing, left: 0, bottom: Constants.sectionSpacing, right: 0)
     }
     
     private func setupLayout() {
@@ -131,37 +128,110 @@ extension GalleryViewController: UICollectionViewDelegate, UICollectionViewDataS
         navigationController?.pushViewController(editor, animated: true)
         collectionView.deselectItem(at: indexPath, animated: true)
     }
-    
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        if let lastSelection = self.lastSelection {
-            self.collectionView.reloadItems(at: [lastSelection])
-        }
-    }
 }
 
-// MARK: - UICollectionViewDelegateFlowLayout
+// MARK: - UICollectionViewLayout
 
-extension GalleryViewController: UICollectionViewDelegateFlowLayout {
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let style = photoDataSource.sectionStyleForSecton(indexPath.section)
-        switch style {
-        case.featured:
-            let width = (collectionView.frame.size.width - Constants.interitemSpacing) / 2
-            let height = width / 2
-            return CGSize(width: width, height: height)
-            
-        case .featuredFooter:
-            let width = (collectionView.frame.size.width - 3 * Constants.interitemSpacing) / 4
-            let height = width / 2
-            return CGSize(width: width, height: height)
-        
-        case .normal:
-            let width = (collectionView.frame.size.width - 4 * Constants.interitemSpacing) / 5
-            let height = width
-            return CGSize(width: width, height: height)
+extension GalleryViewController {
+    private func makeCollectionViewLayout() -> UICollectionViewLayout {
+        return UICollectionViewCompositionalLayout { (section, environment) in
+            let style = self.photoDataSource.sectionStyleForSecton(section)
+            switch style {
+            case .featured:
+                return self.makeFeaturedLayoutSection(environment)
+            case .featuredFooter:
+                return self.makeFeaturedFooterLayoutSection()
+            case .normal:
+                return self.makeNormalLayoutSection()
+            }
         }
+    }
+    
+    private func makeFeaturedLayoutSection(_ environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
+        let layoutItem = NSCollectionLayoutItem(
+            layoutSize: NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(1.0),
+                heightDimension: .fractionalHeight(1.0)
+            )
+        )
+        layoutItem.contentInsets = NSDirectionalEdgeInsets(
+            top: 0,
+            leading: Constants.interitemSpacing,
+            bottom: 0,
+            trailing: Constants.interitemSpacing
+        )
+        let groupWidth = environment.container.contentSize.width * 0.94
+        let layoutGroup = NSCollectionLayoutGroup.horizontal(
+            layoutSize: NSCollectionLayoutSize(
+                widthDimension: .absolute(groupWidth),
+                heightDimension: .absolute(groupWidth / 2)
+            ),
+            subitem: layoutItem,
+            count: 1
+        )
+        let layoutSection = NSCollectionLayoutSection(group: layoutGroup)
+        let sectionHorizontalInset = (environment.container.contentSize.width - groupWidth) / 2
+        layoutSection.contentInsets = NSDirectionalEdgeInsets(
+            top: Constants.sectionSpacing,
+            leading: sectionHorizontalInset,
+            bottom: Constants.sectionSpacing,
+            trailing: sectionHorizontalInset
+        )
+        layoutSection.orthogonalScrollingBehavior = .groupPaging
+        return layoutSection
+    }
+    
+    private func makeFeaturedFooterLayoutSection() -> NSCollectionLayoutSection {
+        let layoutItem = NSCollectionLayoutItem(
+            layoutSize: NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(1.0),
+                heightDimension: .fractionalHeight(1.0)
+            )
+        )
+        let layoutGroup = NSCollectionLayoutGroup.horizontal(
+            layoutSize: NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(1.0),
+                heightDimension: .fractionalWidth(1.0 / 4.0 / 2.0)
+            ),
+            subitem: layoutItem,
+            count: 4
+        )
+        layoutGroup.interItemSpacing = .fixed(Constants.interitemSpacing)
+        let layoutSection = NSCollectionLayoutSection(group: layoutGroup)
+        layoutSection.interGroupSpacing = Constants.interitemSpacing
+        layoutSection.contentInsets = NSDirectionalEdgeInsets(
+            top: Constants.sectionSpacing,
+            leading: 0,
+            bottom: Constants.sectionSpacing,
+            trailing: 0
+        )
+        return layoutSection
+    }
+    
+    private func makeNormalLayoutSection() -> NSCollectionLayoutSection {
+        let layoutItem = NSCollectionLayoutItem(
+            layoutSize: NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(1.0),
+                heightDimension: .fractionalHeight(1.0)
+            )
+        )
+        let layoutGroup = NSCollectionLayoutGroup.horizontal(
+            layoutSize: NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(1.0),
+                heightDimension: .fractionalWidth(1.0 / 5.0)
+            ),
+            subitem: layoutItem,
+            count: 5
+        )
+        layoutGroup.interItemSpacing = .fixed(Constants.interitemSpacing)
+        let layoutSection = NSCollectionLayoutSection(group: layoutGroup)
+        layoutSection.interGroupSpacing = Constants.interitemSpacing
+        layoutSection.contentInsets = NSDirectionalEdgeInsets(
+            top: Constants.sectionSpacing,
+            leading: 0,
+            bottom: Constants.sectionSpacing,
+            trailing: 0
+        )
+        return layoutSection
     }
 }
